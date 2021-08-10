@@ -2,8 +2,7 @@
 "   /██    /██ /██                      /██████                       /██████  /██
 "  | ██   | ██|__/                     /██__  ██                     /██__  ██|__/
 "  | ██   | ██ /██ /██████/████       | ██  \__/  /██████  /███████ | ██  \__/ /██  /██████
-"  |  ██ / ██/| ██| ██_  ██_  ██      | ██       /██__  ██| ██__  ██| ████    | ██ /██__  ██
-"   \  ██ ██/ | ██| ██ \ ██ \ ██      | ██      | ██  \ ██| ██  \ ██| ██_/    | ██| ██  \ ██
+"  |  ██ / ██/| ██| ██_  ██_  ██      | ██       /██__  ██| ██__  ██| ████    | ██ /██__  ██ "   \  ██ ██/ | ██| ██ \ ██ \ ██      | ██      | ██  \ ██| ██  \ ██| ██_/    | ██| ██  \ ██
 "    \  ███/  | ██| ██ | ██ | ██      | ██    ██| ██  | ██| ██  | ██| ██      | ██| ██  | ██
 "     \  █/   | ██| ██ | ██ | ██      |  ██████/|  ██████/| ██  | ██| ██      | ██|  ███████
 "      \_/    |__/|__/ |__/ |__/       \______/  \______/ |__/  |__/|__/      |__/ \____  ██
@@ -49,6 +48,8 @@ filetype plugin on
 au BufNewFile,BufRead *.endfile set filetype=endfile
 filetype plugin indent on
 colorscheme wpgtk
+
+set omnifunc=syntaxcomplete#Complete
 
 let g:md_pdf_viewer="zathura"
 map <Down> <c-e>
@@ -97,12 +98,17 @@ Plugin 'vim-airline/vim-airline'
 Plugin 'xuhdev/vim-latex-live-preview'
 Plugin 'junegunn/goyo.vim'
 Plugin 'junegunn/limelight.vim'
-Plugin 'valloric/youcompleteme'
+Plugin 'neoclide/coc.nvim'
+"Plugin 'valloric/youcompleteme'
+"Pl
 Plugin 'gmarik/Vundle.vim'
+"Experimentals:
+Plugin 'pangloss/vim-javascript'
+Plugin 'styled-components/vim-styled-components'
+"Plugin 'mattn/emmet-vim'
 " Old Plugins(might or might not use again)
 "Plugin 'dylanaraps/wal.vim'
 "Plugin 'jpalardy/vim-slime'
-"Plugin 'mattn/emmet-vim'
 "Plugin 'nvie/vim-flake8'
 "Plugin 'cakebaker/scss-syntax.vim'
 "Plugin 'luochen1990/rainbow'
@@ -221,6 +227,65 @@ nnoremap <Leader>d :SlimeSend1 %debug<CR>
 nnoremap <Leader>q :SlimeSend1 exit<CR>
 
 "------------------------------------------------------------------------------
+" COC Settings
+"------------------------------------------------------------------------------
+" Set internal encoding of vim, not needed on neovim, since coc.nvim using some
+" unicode characters in the file autoload/float.vim
+set encoding=utf-8
+
+" TextEdit might fail if hidden is not set.
+set hidden
+
+" Some servers have issues with backup files, see #649.
+set nobackup
+set nowritebackup
+
+" Give more space for displaying messages.
+set cmdheight=2
+
+" Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable
+" delays and poor user experience.
+set updatetime=300
+
+" Don't pass messages to |ins-completion-menu|.
+set shortmess+=c
+
+" Always show the signcolumn, otherwise it would shift the text each time
+" diagnostics appear/become resolved.
+if has("nvim-0.5.0") || has("patch-8.1.1564")
+  " Recently vim can merge signcolumn and number column into one
+  set signcolumn=number
+else
+  set signcolumn=yes
+endif
+
+" Use tab for trigger completion with characters ahead and navigate.
+" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+" other plugin before putting this into your config.
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+if has('nvim')
+  inoremap <silent><expr> <c-space> coc#refresh()
+else
+  inoremap <silent><expr> <c-@> coc#refresh()
+endif
+inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
+                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+" Extencions for COC, i.e. the plugins that support different langs
+let g:coc_global_extensions = [
+            \ 'coc-tsserver',
+            \ 'coc-html',
+            \ 'coc-css'
+            \ ]
+"------------------------------------------------------------------------------
 " Latex Config
 "------------------------------------------------------------------------------
 autocmd BufNewFile,BufRead *.tex set syntax=tex
@@ -266,7 +331,7 @@ im <C-B> <C-O>:setl sr! fo<C-R>=strpart("-+",&sr,1)<CR>=tc<CR>_<BS><Right>
 	autocmd FileType tex nnoremap ,up /usepackage<Enter>o\usepackage{}<Esc>i
 	autocmd FileType tex inoremap ,tt \texttt{}<Space><++><Esc>T{i
 	autocmd FileType tex inoremap ,bt {\blindtext}
-	#autocmd FileType tex inoremap ,nu $\varnothing$
+	"autocmd FileType tex inoremap ,nu $\varnothing$
 	autocmd FileType tex inoremap ,col \begin{columns}[T]<Enter>\begin{column}{.5\textwidth}<Enter><Enter>\end{column}<Enter>\begin{column}{.5\textwidth}<Enter><++><Enter>\end{column}<Enter>\end{columns}<Esc>5kA
     autocmd FileType tex inoremap ,rn (\ref{})<++><Esc>F}i
     autocmd FileType tex inoremap ,sus \textsubscript{}<++><Esc>T{i
